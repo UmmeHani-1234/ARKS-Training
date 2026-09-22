@@ -11,13 +11,11 @@ const STATUS_STYLES: Record<string, string> = {
 
 interface LeadsTableProps {
   leads: Lead[];
+  onEdit:   (lead: Lead) => void;
+  onDelete: (lead: Lead) => void;
 }
 
-/**
- * LeadsTable — searchable, sortable table of leads.
- * Accepts leads as a prop so it can be used from server-fetched pages.
- */
-export default function LeadsTable({ leads }: LeadsTableProps) {
+export default function LeadsTable({ leads, onEdit, onDelete }: LeadsTableProps) {
   const [search, setSearch] = useState("");
 
   const filtered = leads.filter(
@@ -39,7 +37,7 @@ export default function LeadsTable({ leads }: LeadsTableProps) {
         </span>
         <input
           type="text"
-          placeholder="Search leads by name, email, company, or status..."
+          placeholder="Search by name, email, company, or status…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
@@ -51,7 +49,7 @@ export default function LeadsTable({ leads }: LeadsTableProps) {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              {["#", "Name", "Email", "Company", "Status", "Date Added"].map((h) => (
+              {["#", "Name", "Email", "Company", "Status", "Date Added", "Actions"].map((h) => (
                 <th
                   key={h}
                   className="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
@@ -64,7 +62,7 @@ export default function LeadsTable({ leads }: LeadsTableProps) {
           <tbody className="bg-white divide-y divide-gray-100">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-5 py-8 text-center text-sm text-gray-400">
+                <td colSpan={7} className="px-5 py-8 text-center text-sm text-gray-400">
                   No leads match your search.
                 </td>
               </tr>
@@ -76,15 +74,29 @@ export default function LeadsTable({ leads }: LeadsTableProps) {
                   <td className="px-5 py-4 text-sm text-gray-600">{lead.email}</td>
                   <td className="px-5 py-4 text-sm text-gray-600">{lead.company}</td>
                   <td className="px-5 py-4">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        STATUS_STYLES[lead.status] ?? "bg-gray-100 text-gray-700"
-                      }`}
-                    >
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLES[lead.status] ?? "bg-gray-100 text-gray-700"}`}>
                       {lead.status}
                     </span>
                   </td>
                   <td className="px-5 py-4 text-sm text-gray-500">{lead.date}</td>
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-2">
+                      {/* Edit */}
+                      <button
+                        onClick={() => onEdit(lead)}
+                        className="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 px-2 py-1 rounded-md transition-colors"
+                      >
+                        ✏️ Edit
+                      </button>
+                      {/* Delete */}
+                      <button
+                        onClick={() => onDelete(lead)}
+                        className="inline-flex items-center gap-1 text-xs font-medium text-red-600 hover:text-red-800 hover:bg-red-50 px-2 py-1 rounded-md transition-colors"
+                      >
+                        🗑️ Delete
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))
             )}
